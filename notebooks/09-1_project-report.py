@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.insert(1, '..')
+from importlib import reload
 import recommender as rcmd
 from recommender.contrib import fmp_api as fmp
 import sklearn_recommender as skr

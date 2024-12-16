@@ -91,7 +91,7 @@ class QuandlTicker(Ticker):
       resolution = TickerResolution.from_string(resolution)
 
     # TODO: check the relevant time frame & resolution
-    data = quandl.get(symbol, start_date=start, end_date=end)
+    data = quandl.get(symbol, start_date=utils.datetime.now(), end_date=utils.datetime.now())
 
     # TODO: update the pandas data
     if resolution.adjusted:
