@@ -1,169 +1,125 @@
-# Stock Trend Analysis
+# A recommender system to Buy-and-Hold Investors
 
-This project contains a stock-recommender system that uses quarterly reports, news information pieces and stock prices to recommend relevant stocks for further (manual) analysis based on user interest (e.g. resources or tech-companies). The system is designed for relevance, novelty and serendipity (with configurable parameters) to allow exploration of potential n-bagger stocks.
+Esse projeto contém um sistema de recomendação que utiliza de mais de 40 anos de dados de relatórios, balanços contábeis e análises financeiras para recomender ações. São escolhidas as melhores empresas disponíveis e, as que mais se assemelham com as empresas que o usuário já possui em seu portfólio, são recomendadas.
 
-## Getting Started
+O foco do trabalho é em recomendar ações para investidores conhecidos como Buy-and-holders.
+Buy-and-hold é é uma estratégia de investimento de longo prazo na qual os investidores adquirem ativos financeiros, especialmente ações, com a intenção de mantê-los por um período significativo de tempo, geralmente anos ou décadas. Nesta estratégia, não existe interesse em realizar lucros através da venda de ações.
 
-**1. Data Access:**
 
+## API
 
-First you will need to create a `keys.csv` file in the root directory that contains the API keys for the various serivces used. You can find the available keys in the `keys.tmp.csv` template.
 
+Para chamar o recomendador em produção:
 
-**2. Training:**
+  - curl "https://ficaaiofeedback.fun/fica_ai_o_feedback/get_stocks_recommendations?stocks=AMZN,LAKE&number_of_recommendations=5&number_of_top_companies=15"
 
 
-Next we need to train the machine learning models. This is currently done in the regarding notebook (`03-1_stock-prediction.ipynb`), but will be outsourced into a separate training file in the future.
+Os parâmetros a serem enviados:
 
+*stocks:* As ações que você possui em carteira separadas por vírgula. Exemplo: stocks=AMZN,LAKE
 
-**3. Deploy:**
+*number_of_recommendations:* Quantidade de recomendações que você deseja receber. Por padrão, são recomendadas 5 empresas. Exemplo: number_of_recommendations=5
 
+*number_of_top_companies:* Quantidade de empresas selecionadas para análise de similaridade.
+Quanto maior o número deste parâmetro, maior também será o risco e as novidades das recomendações. Por padrão, são utilizadas 20 empresas. Exemplo: number_of_top_companies=25
 
-The simplest way to execute the project, is using the streamlit report. Simply install streamlit (`pip install streamlit`) and execute the report file:
 
-```bash
-$ cd notebooks
-$ streamlit run 09-1_project-report.py
-```
+## Dataset
 
-> Note: As no data is provided in this repo, the first start might take a few minutes to download the relevant profile data from the API
+**1. Dataset pronto**
+https://drive.google.com/drive/u/0/folders/1wAL7pEST0MeCtJytRNbGba2mez_nBwK5
 
-![Example Video](./imgs/streamlit.gif)
 
-> Note: The web-app is currently not functional, but will come soon.
+**2. Construindo do zero**
 
+Se desejar construir o arquivo de análises do zero:
 
-The system deploys as a flask web services. The easiest way to run it is through docker (recommended [nvidia docker](https://github.com/NVIDIA/nvidia-docker) for TensorFlow components):
+1. faça o download do arquivo **nasdaq_companies_metadata.csv**, no link do drive. Mova-o para a pasta `data`.
 
-```bash
-$ docker build -t felixnext/stocks .
-$ docker run -d -p 8000:3001 --name stocks -v <PATH>:/storage felixnext/stocks
-```
+2. Crie um arquivo keys.csv baseado no template [keys](keys.tmp.csv) 
 
-The service should now be available under `http://localhost:8000/`
+3. Adicione sua API key registrada no site: [FinancialModellingPrep API](https://site.financialmodelingprep.com/developer/docs/dashboard)
 
-You might also run the system locally through the command line:
+4. Rode o script [Script para preprocessar os dados](lib/stock_data_process.py).
 
-```bash
-$ cd frontend
-$ python run.py
-```
 
-The service should now be available under `http://localhost:3001/`
+**3. Para montar o setup em sua máquina:**
+Necessário python 3.10.x, com pip instalado.
 
-## Code documentation
+1. Crie o ambiente virtual: `python3 virtualenv .venv`
+2. Ative o ambiente virtual `source .venv/bin/activate`
+3. Instalar as dependências `pip install -r requirements.txt`
+4. Faça o download do dataset ([dataset](https://drive.google.com/drive/u/0/folders/1wAL7pEST0MeCtJytRNbGba2mez_nBwK5)), mova-os para a pasta `data`
+5. Entre na pasta lib `cd lib`
+6. Para rodar o recomendador `python content_based_recommender.py`
 
-You can find the documentation of the `recommender` library [here](recommender.md)
 
-## Architecture
+## Arquitetura
 
-The goal of the system should be to provide recommendations of stocks for a specific user. Therefore the system should leverage the following information:
+O sistema consite de três partes principais:
 
-* User Interest - Which economic field the user wants to invest in (KB Filtering)
-* Specific Stocks - Which stocks liked the user
-* Stock Forecast - Using various sources of information (including news, balance sheet statements and historic stock prices among others) to create a ranking for stocks to suggest potentially profitable stocks to the user
+1. API que consome dados de duas fontes principais: FMPStatements(https://site.financialmodelingprep.com/) e da NASDAQ (https://www.nasdaq.com/). São utilizados dados de mais de 40 anos com relatórios oficiais, contábeis e análises. Somente empresas com pelo menos 4 anos de IPO são utilizados, visto que empresas com menos do que isso não possuem dados o suficiente para serem julgadas de forma apropriada.
 
-### General Design
 
-You can find the data analysis and test of single algorithms in the jupyter notebooks (`notebooks` folder).
-Based on the results, I have created the actual Machine Learning Pipeline as a separate package in the `recommender` folder.
-This in turn is used by the `frontend` to be integrated into a flask webapp.
+2. Os dados são sumarizados e as empresas são ordenadas de acordo com algumas métricas.
 
-**Recommender**
+  - Média do lucro líquido da empresa nos últimos 5 anos.
 
-The recommender consists of the following parts:
+  - Anos com lucro líquido desde o IPO
 
-1. ETL Pipeline - This pipeline uses various APIs (e.g. RSS Feeds, Stock APIs) to gather relevant information and create a list of available stocks with categories to recommend
-2. Higher Order Features - Machine learning pipeline that uses various approaches to generate higher-order features based on the data coming from ETL (e.g. a rating for stock profitability)
-3. User Recommendation - A recommendation system that compares user interest to relevant stocks and computes the higher-order features for these stocks to generate a basic understanding of the data
+  - Lucro líquido no último ano contábil
 
-All pipelines are implemented into a Spark Process, allowing them to easily scale out.
+  - Crescimento do lucro líquido por ação, nos últimos 10 anos
 
-**Frontend**
+  - Crescimento do lucro líquido por ação, nos últimos 5 anos
 
-The frontend consists of a simple flask web-app that has access to the spark pipeline. From there it can retrieve information and render general stock information to the user.
+  - Market Cap (Número de ações daquela empresa negociadas na Bolsa de Valores multiplicado pelo valor individual de cada ação.)
 
-### Data Sources
+  - Crescimento do lucro líquido no último ano contábil
 
-The system uses various sources of data. However, as financial apis appear incomplete and volatile, the system pacakges each of these API behind an abstraction interface, that will make it easier to change or add new APIs down the road.
+As empresas são ordenadas na ordem listada dos atributos, com as superiores ficando no topo.
+Novas métricas serão adicionadas no futuro, e provavelmente uma forma mais sofisticada de rankeamento.
 
-**Stock Data**
+3. Por último, o recomendador considera o portfólio do usuário para recomendar as melhores X ações da lista.
+É utilizado um recomendador baseado em conteúdo que calcula as similaridades das empresas do portfolio do usuário com as top X empresas disponíveis de acordo com 5 características:
 
-* Alpha Vantage Data (through [alpha-vantage](https://github.com/RomelTorres/alpha_vantage)) - Allows to retrieve daily stock data (including long range historic data). It also allows to retrieve intra-day data (in 15min intervals)
-* Quandl Data (through [quandl](https://github.com/quandl/quandl-python)) - Allows to retrieve intraday trading data (however does not have long term historic data in free plans)
+  - País
 
-*Training Data*
+  - Setor
 
-* For training an additional [stock market dataset](https://www.kaggle.com/borismarjanovic/price-volume-data-for-all-us-stocks-etfs) is used to account for historic data
+  - Indústria
 
-> Note: There is a download script to retrieve the data in `data` folder. Before you run it, make sure you have the [kaggle-cli](https://github.com/Kaggle/kaggle-api) installed and setup
+  - Ano do IPO
 
+  - Market CAP
 
-**Quarterly Reports**
+4. As empresas com maior similaridade são retornadas.
 
-* IEX Cloud (using [iexfinance](https://github.com/addisonlynch/iexfinance))
-* Financial Modeling Prep (using the [API](https://financialmodelingprep.com/developer/docs/) directly)
 
-**News Ticker**
+## Resultados
 
-* Twitter Data - (using [tweepy](https://github.com/tweepy/tweepy))
-* RSS Feeds - This allows us to basically read in any news source (using [feedparser](https://github.com/kurtmckee/feedparser))
+Os resultados consideram o seguinte portfólio inicial (gerado randomicamente):
+portofolio inicial = [LAKE, DSWL, GIFI, PANL, ALLT]
 
-*Sources of RSS Data:*
+# Simulação de Monte Carlo
+Ferramenta utilizada: ([Análise de portfólios](https://www.portfoliovisualizer.com/analysis))
 
-* Google Alerts - Allow to create a RSS reader based on any topic (using [python library](https://github.com/9b/google-alerts))
-* Financial Times [RSS Feed](https://www.ft.com/business-education?format=rss)
-* CNN Money [RSS Feed](http://rss.cnn.com/rss/money_latest.rss)
+Foram considerados três portfólios: O inicial do usuário (citado acima), um após a recomendação do trabalho e outro com recomendações totalmente aleatórias.
 
-**Economic Data**
 
-* World Bank - (using [wbdata](https://github.com/oliversherouse/wbdata))
+## Trabalhos Futuros
 
-### Data Insights
+* Melhorar os critérios de rankeamento das empresas
 
-A current report on the data insights is in [this markdown](19-09_project-results.md).
+* Adicionar cálculos para avaliar o risco do portfólio recomendado (exemplo: Índice de Sharpe)
 
-### ML Pipeline Design
+* Suporte ao mercado de ações do Brasil
 
-The pipeline has two core components: The stock classifier (higher order features) and the actual recommender system.
+* Integrar análises nos testes ( hoje são utilizadas plataformas de terceiros )
 
-#### Stock Classifier
+* Adicionar a quantidade de ações para cada empresa (Tanto nos portfólios de input como nos recomendados)
 
-There are multiple approaches for classification that
 
-* MutliOutput - Logistic Regression and SVMs
-* Feedforward Network
-
-The stock classifier is tested on historic stock data (test-set that is hold-out from the training set). The categories and time-frames are clearly defined.
-
-**Experiments**
-
-The performance of the classifier is measured through accuracy and a custom metric (as the result is a ordered scale, we can penalize close categories).
-
-#### Recommender
-
-The recommender is based on NLP parsing of user queries to identify relevant stocks and using the prediction system to rank the stocks. The system can be tested through streamlit by running: `streamlit run notebooks/09-1_project-report.py`
-
-## Dependencies
-
-I am using the following packages for the system:
-
-* [sklearn-recommender](https://github.com/felixnext/sklearn-recommender) (*note: written for this project, but decoupled into a separate repository*)
-* DS Python Toolstack (Pandas, Numpy, Sklearn, Seaborn, Matplotlib, etc.)
-* TensorFlow
-
-## Future Work
-
-* Integration of Spark to handle online learning and real-time data processing (continuous prediction)
-* Create Recommenders for different time frames
-* Integrate multiple higher order features
-* Create additional higher order features (e.g. RNN predictions)
-* Integrate Rule Based approaches (e.g. implement Ben Graham Strategies)
-* Implement better error handling for `financialmodelingprep`
-* Balance Dataset for prediction
-* Test additional NLP approaches (LSTM embeddings through character prediction)
-* Bayesian Networks to measure confidence in stock predictions
-
-## License
-
-The code is published under MIT License.
+## Apresentação
+- Slides:
+- Vídeo:

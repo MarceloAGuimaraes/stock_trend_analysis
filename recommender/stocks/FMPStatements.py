@@ -14,7 +14,7 @@ class FMPStatements(Statements):
   Args:
     granularity (str): Default granularity that is used for statements (options: 'annual', 'quarter')
   '''
-  def __init__(self, granularity='quarter'):
+  def __init__(self, granularity='annual'):
     self.period = granularity
 
   def _filter(self, df, before, after):
@@ -58,7 +58,6 @@ class FMPStatements(Statements):
       'Inventories': 'inventory',
       'Total shareholders equity': 'shareholder_equity'
     }
-    type_map = {}
     df = df.rename(columns=name_map).loc[:, list(name_map.values())].astype('float32')
 
     return df
@@ -89,7 +88,7 @@ class FMPStatements(Statements):
     period = self.period if period is None else period
     # retrieve the relevant data
     df = fmp_api.statements.income(symbol, period=period)
-    df = self._filter(df, before, after)
+    # df = self._filter(df, before, after)
 
     # convert data in common format
     name_map = {
@@ -104,6 +103,7 @@ class FMPStatements(Statements):
       'R&D Expenses': 'expenses_research',
       'Operating Expenses': 'expenses_operating',
       'Net Income': 'income_net',
+      'TEST': 'netIncome',
       'Operating Income': 'income_operating',
       'Dividend per Share': 'dividend_share',
       'Revenue': 'revenue',
@@ -121,20 +121,20 @@ class FMPStatements(Statements):
 
     # convert the relevant data
     name_map = {
-      'Debt Growth': 'debt_growth',
-      'R&D Expense Growth': 'research_growth',
-      'Book Value per Share Growth': 'bookvalue_share_growth',
-      'EPS Growth': 'eps_growth',
-      'Dividends per Share Growth': 'dividend_share_growth'
+      'debtGrowth': 'debt_growth',
+      'rdexpenseGrowth': 'research_growth',
+      'bookValueperShareGrowth': 'bookvalue_share_growth',
+      'epsgrowth': 'eps_growth',
+      'dividendsperShareGrowth': 'dividend_share_growth'
     }
     if period == 'annual':
       name_map.update( {
-        '10Y Dividend per Share Growth (per Share)': 'dividend_share_growth_10y',
-        '5Y Dividend per Share Growth (per Share)': 'dividend_share_growth_5y',
-        '3Y Dividend per Share Growth (per Share)': 'dividend_share_growth_3y',
-        '10Y Revenue Growth (per Share)': 'revenue_share_growth_10y',
-        '5Y Revenue Growth (per Share)': 'revenue_share_growth_5y',
-        '3Y Revenue Growth (per Share)': 'revenue_share_growth_3y',
+        'tenYDividendperShareGrowthPerShare': 'dividend_share_growth_10y',
+        'fiveYDividendperShareGrowthPerShare': 'dividend_share_growth_5y',
+        'threeYDividendperShareGrowthPerShare': 'dividend_share_growth_3y',
+        'tenYRevenueGrowthPerShare': 'revenue_share_growth_10y',
+        'fiveYRevenueGrowthPerShare': 'revenue_share_growth_5y',
+        'threeYRevenueGrowthPerShare': 'revenue_share_growth_3y',
       } )
     df = df.rename(columns=name_map).loc[:, list(name_map.values())].astype('float32')
 
