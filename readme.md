@@ -6,16 +6,35 @@ O foco do trabalho é em recomendar ações para investidores conhecidos como Bu
 Buy-and-hold é é uma estratégia de investimento de longo prazo na qual os investidores adquirem ativos financeiros, especialmente ações, com a intenção de mantê-los por um período significativo de tempo, geralmente anos ou décadas. Nesta estratégia, não existe interesse em realizar lucros através da venda de ações.
 
 
-## Getting Started
+## API
 
-**1. Dataset :**
 
-Para o dataset pronto, acesse: https://drive.google.com/drive/u/0/folders/1wAL7pEST0MeCtJytRNbGba2mez_nBwK5
-Faça o download e mova os arquivos para a pasta **data**.
+Para chamar o recomendador em produção:
 
-Se desejar construir o arquivo sumarizado de análises do zero:
+  - curl "https://ficaaiofeedback.fun/fica_ai_o_feedback/get_stocks_recommendations?stocks=AMZN,LAKE&number_of_recommendations=5&number_of_top_companies=15"
 
-1. faça o download do arquivo ** nasdaq_companies_metadata.csv **, no link do drive
+
+Os parâmetros a serem enviados:
+
+*stocks:* As ações que você possui em carteira separadas por vírgula. Exemplo: stocks=AMZN,LAKE
+
+*number_of_recommendations:* Quantidade de recomendações que você deseja receber. Por padrão, são recomendadas 5 empresas. Exemplo: number_of_recommendations=5
+
+*number_of_top_companies:* Quantidade de empresas selecionadas para análise de similaridade.
+Quanto maior o número deste parâmetro, maior também será o risco e as novidades das recomendações. Por padrão, são utilizadas 20 empresas. Exemplo: number_of_top_companies=25
+
+
+## Dataset
+
+**1. Dataset pronto**
+https://drive.google.com/drive/u/0/folders/1wAL7pEST0MeCtJytRNbGba2mez_nBwK5
+
+
+**2. Construindo do zero**
+
+Se desejar construir o arquivo de análises do zero:
+
+1. faça o download do arquivo **nasdaq_companies_metadata.csv**, no link do drive. Mova-o para a pasta `data`.
 
 2. Crie um arquivo keys.csv baseado no template [keys](keys.tmp.csv) 
 
@@ -23,22 +42,17 @@ Se desejar construir o arquivo sumarizado de análises do zero:
 
 4. Rode o script [Script para preprocessar os dados](lib/stock_data_process.py).
 
-**2. Para chamar o recomendador em produção:**
-
-  - curl https://ficaaiofeedback.fun/fica_ai_o_feedback/get_stocks_recommendations?stocks=AMZN,APPL&number_of_recommendations=5&number_of_top_companies=15
-
-
-Os parâmetros a serem enviados:
-
-*stocks:* As ações que você possui em carteira separadas por vírgula. Exemplo: stocks=AMZN,APPL
-
-*number_of_recommendations:* Quantidade de recomendações que você deseja receber. Por padrão, são recomendadas 5 empreas. Exemplo: number_of_recommendations=5
-
-*number_of_top_companies:* Quantidade de empresas selecionadas para análise de similaridade.
-Quanto maior o número deste parâmetro, maior também será o risco e as novidades das recomendações. Por padrão, são utilizadas 20 empresas. Exemplo: number_of_top_companies=25
 
 **3. Para montar o setup em sua máquina:**
-[setup](setup_notes.md)
+Necessário python 3.10.x, com pip instalado.
+
+1. Crie o ambiente virtual: `python3 virtualenv .venv`
+2. Ative o ambiente virtual `source .venv/bin/activate`
+3. Instalar as dependências `pip install -r requirements.txt`
+4. Faça o download do dataset ([dataset](https://drive.google.com/drive/u/0/folders/1wAL7pEST0MeCtJytRNbGba2mez_nBwK5)), mova-os para a pasta `data`
+5. Entre na pasta lib `cd lib`
+6. Para rodar o recomendador `python content_based_recommender.py`
+
 
 ## Arquitetura
 
@@ -88,27 +102,24 @@ Os resultados consideram o seguinte portfólio inicial (gerado randomicamente):
 portofolio inicial = [LAKE, DSWL, GIFI, PANL, ALLT]
 
 # Simulação de Monte Carlo
-Utilizada a ferramenta ([Análise de portfólios](https://www.portfoliovisualizer.com/analysis))
+Ferramenta utilizada: ([Análise de portfólios](https://www.portfoliovisualizer.com/analysis))
 
-Foi feito um T
-Foram considerados três portfólios: O inicial do usuário, um após a recomendação do trabalho e outro com recomendações totalmente aleatórias.
+Foram considerados três portfólios: O inicial do usuário (citado acima), um após a recomendação do trabalho e outro com recomendações totalmente aleatórias.
 
-Foi selecionado um portfólio inicial com as seguintes ações aleatórias:
 
-## Trabalho Futuro
+## Trabalhos Futuros
 
-* Melhorar os critérios de rankeamento das melhores empresas
+* Melhorar os critérios de rankeamento das empresas
 
-* Adicionar cálculos avançados de risco do portfólio (Índice de Sharpe) quando recomendando
-
-* Integrar análises nos testes ( hoje são utilizadas plataformas de terceiros, o que limita o volume)
-
-* Adicionar o perfil do investidor
+* Adicionar cálculos para avaliar o risco do portfólio recomendado (exemplo: Índice de Sharpe)
 
 * Suporte ao mercado de ações do Brasil
 
+* Integrar análises nos testes ( hoje são utilizadas plataformas de terceiros )
 
-## Slides e Vídeo
+* Adicionar a quantidade de ações para cada empresa (Tanto nos portfólios de input como nos recomendados)
 
+
+## Apresentação
 - Slides:
 - Vídeo:
