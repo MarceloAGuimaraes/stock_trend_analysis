@@ -86,14 +86,12 @@ class ContentBasedRecommender:
         target_user_rated_companies_idx = self.companies_df[
             self.companies_df["Symbol"].isin(target_user_portfolio)
         ].index
-        recommendations = []
+        recommendations = {}
 
         # If target user portfolio is empty, this is probably a cold-start scenario
         if len(target_user_rated_companies_idx) == 0:
             for company_to_recommend in companies_to_recommend[:5]:
-                recommendations.append(
-                    {"company": company_to_recommend, "similarity": 1.0}
-                )
+                recommendations[company_to_recommend] = 1.0
         else:
             # If no specific list of movies is passed, try to predict for all movies that user didn't rate
             if len(companies_to_recommend) == 0:
@@ -112,63 +110,63 @@ class ContentBasedRecommender:
                         "Symbol"
                     ]
                     similarity = company_similarities[company_to_recommend_idx]
-                    recommendations.append(
-                        {"company": company_ticker, "similarity": similarity}
-                    )
+                    if (
+                        company_ticker not in recommendations
+                        or similarity > recommendations[company_ticker]
+                    ):
+                        recommendations[company_ticker] = similarity
+        return sorted(recommendations.items(), key=lambda item: item[1], reverse=True)[
+            :number_of_recommendations
+        ]
 
-        return sorted(
-            recommendations,
-            key=lambda x: (x["similarity"], x["company"]),
-            reverse=True,
-        )[:number_of_recommendations]
 
+# user_tickers = args.tickers
+#
+# dtype = {
+#     "company": "string",
+#     "net_income_last_five_years": "float32",
+#     "years_with_positive_net_income": "int64",
+#     "current_net_income": "float32",
+#     "ten_years_net_income_per_share_growth": "float32",
+#     "five_years_net_income_per_share_growth": "float32",
+#     "current_market_cap": "float32",
+#     "net_income_growth": "float32",
+# }
+#
+# summary_columns = [
+#     "company",
+#     "current_net_income",
+#     "years_with_positive_net_income",
+#     "net_income_last_five_years",
+#     "ten_years_net_income_per_share_growth",
+#     "five_years_net_income_per_share_growth",
+#     "net_income_growth",
+#     "current_market_cap",
+# ]
+#
+# existing_summarized_df = pd.read_csv(
+#     "../data/nasdaq_companies_summarized_data.csv",
+#     dtype=dtype,
+#     usecols=summary_columns,
+#     low_memory=False,
+#     engine="c",
+# )
+#
+# # Selecting the top 30 companies that the user does not have in his portfolio
+# companies_to_recommend = (
+#     existing_summarized_df[~(existing_summarized_df["company"].isin(user_tickers))]
+#     .head(15)[["company"]]["company"]
+#     .values
+# )
 
-user_tickers = args.tickers
-
-dtype = {
-    "company": "string",
-    "net_income_last_five_years": "float32",
-    "years_with_positive_net_income": "int64",
-    "current_net_income": "float32",
-    "ten_years_net_income_per_share_growth": "float32",
-    "five_years_net_income_per_share_growth": "float32",
-    "current_market_cap": "float32",
-    "net_income_growth": "float32",
-}
-
-summary_columns = [
-    "company",
-    "current_net_income",
-    "years_with_positive_net_income",
-    "net_income_last_five_years",
-    "ten_years_net_income_per_share_growth",
-    "five_years_net_income_per_share_growth",
-    "net_income_growth",
-    "current_market_cap",
-]
-
-existing_summarized_df = pd.read_csv(
-    "../data/nasdaq_companies_summarized_data.csv",
-    dtype=dtype,
-    usecols=summary_columns,
-    low_memory=False,
-    engine="c",
-)
-
-# Selecting the top 30 companies that the user does not have in his portfolio
-companies_to_recommend = (
-    existing_summarized_df[~(existing_summarized_df["company"].isin(user_tickers))]
-    .head(15)[["company"]]["company"]
-    .values
-)
-
-recommender = ContentBasedRecommender()
-recommended_companies = recommender.recommend(
-    target_user_portfolio=user_tickers,
-    companies_to_recommend=companies_to_recommend,
-    number_of_recommendations=5,
-)
-
-print("AÇÕES RECOMENDADAS")
-for i in recommended_companies:
-    print(i["company"])
+# recommender = ContentBasedRecommender()
+# recommended_companies = recommender.recommend(
+#     target_user_portfolio=user_tickers,
+#     companies_to_recommend=companies_to_recommend,
+#     number_of_recommendations=5,
+# )
+#
+# print("AÇÕES RECOMENDADAS")
+# for i, _j in recommended_companies:
+#     print(i)
+#

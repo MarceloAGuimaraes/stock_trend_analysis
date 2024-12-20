@@ -7,6 +7,7 @@ from datetime import date
 from recommender.contrib.financialmodelingprep import statements as FMPStatements
 import recommender.contrib.financialmodelingprep.indicators as Indicators
 import time
+import numpy as np
 
 currentYear = date.today().year
 
@@ -58,7 +59,7 @@ existing_summarized_df = pd.read_csv(
     engine="c",
 )
 
-summarized_data = []
+summarized_data = np.array([])
 
 for company_ticker in companies_df["Symbol"]:
     data = existing_summarized_df.loc[
@@ -66,7 +67,6 @@ for company_ticker in companies_df["Symbol"]:
     ]
     try:
         if data.empty:
-            time.sleep(2)
             key_metrics_df = Indicators.key_metrics(company_ticker)
             if key_metrics_df.empty == False:
                 key_metrics_df["calendarYear"] = key_metrics_df["calendarYear"].astype(
@@ -127,7 +127,11 @@ for company_ticker in companies_df["Symbol"]:
                     current_net_income = last_year_income_statement["netIncome"].item()
 
                 net_income_last_five_years = (
-                    income_statement_df[["netIncome"]].mean().item()
+                    income_statement_df[income_statement_df["calendarYear"] > 2019][
+                        ["netIncome"]
+                    ]
+                    .mean()
+                    .item()
                 )
                 years_with_positive_net_income = len(
                     income_statement_df[income_statement_df["netIncome"] > 0].index
@@ -135,7 +139,7 @@ for company_ticker in companies_df["Symbol"]:
             else:
                 net_income_last_five_years = 0.0
                 current_net_income = 0.0
-                years_with_positive_net_income = 0.0
+                years_with_positive_net_income = 0
         else:
             current_net_income = data["current_net_income"].item()
             years_with_positive_net_income = data[
@@ -151,26 +155,34 @@ for company_ticker in companies_df["Symbol"]:
             net_income_growth = data["net_income_growth"].item()
             current_market_cap = data["current_market_cap"].item()
 
-        summarized_data.append(
+        summarized_data = np.append(
+            summarized_data,
             {
                 "company": company_ticker,
-                "current_net_income": current_net_income,
-                "years_with_positive_net_income": years_with_positive_net_income,
-                "net_income_last_five_years": net_income_last_five_years,
-                "ten_years_net_income_per_share_growth": ten_years_net_income_per_share_growth,
-                "five_years_net_income_per_share_growth": five_years_net_income_per_share_growth,
-                "net_income_growth": net_income_growth,
-                "current_market_cap": current_market_cap,
-            }
+                "current_net_income": np.float32(current_net_income),
+                "years_with_positive_net_income": np.int64(
+                    years_with_positive_net_income
+                ),
+                "net_income_last_five_years": np.float32(net_income_last_five_years),
+                "ten_years_net_income_per_share_growth": np.float32(
+                    ten_years_net_income_per_share_growth
+                ),
+                "five_years_net_income_per_share_growth": np.float32(
+                    five_years_net_income_per_share_growth
+                ),
+                "net_income_growth": np.float32(net_income_growth),
+                "current_market_cap": np.float32(current_market_cap),
+            },
         )
+        np.save("../data/cache/summarized_data.npy", summarized_data)
     except Exception as e:
         print(
             "=============================== ERRO ==================================="
         )
-        print(e)
+        # print(e)
         break
 
-summarized_df = pd.DataFrame(data=summarized_data, columns=summary_columns)
+summarized_df = pd.DataFrame(data=summarized_data.tolist(), columns=summary_columns)
 summarized_df = summarized_df.astype(dtype)
 summarized_df.sort_values(
     [
