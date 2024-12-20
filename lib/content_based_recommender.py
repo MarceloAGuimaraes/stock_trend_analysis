@@ -22,9 +22,10 @@ from sklearn.compose import ColumnTransformer
 
 class ContentBasedRecommender:
     def __init__(self):
+        self.prepare_summary_data()
         self.companies_df = (
             pd.read_csv(
-                "../data/nasdaq_companies_metadata.csv",
+                "https://drive.usercontent.google.com/u/0/uc?id=1DXV02gd5E29E-fz7rJBUPMpRlUtzb3ZC&export=download",
                 dtype={
                     "Symbol": "string",
                     "Name": "string",
@@ -46,7 +47,6 @@ class ContentBasedRecommender:
                 low_memory=False,
                 engine="c",
                 na_values=["", " ", "NULL"],
-                memory_map=True,
             )
             .dropna()
             .drop_duplicates(["Symbol"])
@@ -77,12 +77,54 @@ class ContentBasedRecommender:
         tfidf_matrix = tfidf_matrix.astype(np.float32)
         self.similarities = cosine_similarity(tfidf_matrix)
 
+    def prepare_summary_data(self):
+        dtype = {
+            "company": "string",
+            "net_income_last_five_years": "float32",
+            "years_with_positive_net_income": "int64",
+            "current_net_income": "float32",
+            "ten_years_net_income_per_share_growth": "float32",
+            "five_years_net_income_per_share_growth": "float32",
+            "current_market_cap": "float32",
+            "net_income_growth": "float32",
+        }
+        summary_columns = [
+            "company",
+            "current_net_income",
+            "years_with_positive_net_income",
+            "net_income_last_five_years",
+            "ten_years_net_income_per_share_growth",
+            "five_years_net_income_per_share_growth",
+            "net_income_growth",
+            "current_market_cap",
+        ]
+        self.existing_summarized_df = pd.read_csv(
+            "https://drive.usercontent.google.com/u/0/uc?id=1SbCr75VPk1jGQgTlY8WjckgMPPzYEblK&export=download",
+            dtype=dtype,
+            usecols=summary_columns,
+            low_memory=False,
+            engine="c",
+        )
+
+    def companies_to_recommend(self, target_user_portfolio, number_of_top_companies):
+        # Selecting the top 30 companies that the user does not have in his portfolio
+        return (
+            self.existing_summarized_df[
+                ~(self.existing_summarized_df["company"].isin(target_user_portfolio))
+            ]
+            .head(number_of_top_companies)[["company"]]["company"]
+            .values
+        )
+
     def recommend(
         self,
         target_user_portfolio=[],
-        companies_to_recommend=[],
         number_of_recommendations=5,
+        number_of_top_companies=20,
     ):
+        companies_to_recommend = self.companies_to_recommend(
+            target_user_portfolio, number_of_top_companies
+        )
         target_user_rated_companies_idx = self.companies_df[
             self.companies_df["Symbol"].isin(target_user_portfolio)
         ].index
@@ -115,49 +157,11 @@ class ContentBasedRecommender:
                         or similarity > recommendations[company_ticker]
                     ):
                         recommendations[company_ticker] = similarity
+
         return sorted(recommendations.items(), key=lambda item: item[1], reverse=True)[
             :number_of_recommendations
         ]
 
-
-# user_tickers = args.tickers
-#
-# dtype = {
-#     "company": "string",
-#     "net_income_last_five_years": "float32",
-#     "years_with_positive_net_income": "int64",
-#     "current_net_income": "float32",
-#     "ten_years_net_income_per_share_growth": "float32",
-#     "five_years_net_income_per_share_growth": "float32",
-#     "current_market_cap": "float32",
-#     "net_income_growth": "float32",
-# }
-#
-# summary_columns = [
-#     "company",
-#     "current_net_income",
-#     "years_with_positive_net_income",
-#     "net_income_last_five_years",
-#     "ten_years_net_income_per_share_growth",
-#     "five_years_net_income_per_share_growth",
-#     "net_income_growth",
-#     "current_market_cap",
-# ]
-#
-# existing_summarized_df = pd.read_csv(
-#     "../data/nasdaq_companies_summarized_data.csv",
-#     dtype=dtype,
-#     usecols=summary_columns,
-#     low_memory=False,
-#     engine="c",
-# )
-#
-# # Selecting the top 30 companies that the user does not have in his portfolio
-# companies_to_recommend = (
-#     existing_summarized_df[~(existing_summarized_df["company"].isin(user_tickers))]
-#     .head(15)[["company"]]["company"]
-#     .values
-# )
 
 # recommender = ContentBasedRecommender()
 # recommended_companies = recommender.recommend(
