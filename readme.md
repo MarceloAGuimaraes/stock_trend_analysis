@@ -97,15 +97,58 @@ Novas métricas serão adicionadas no futuro, e provavelmente uma forma mais sof
 
 
 ## Resultados
-
-Os resultados consideram o seguinte portfólio inicial (gerado randomicamente):
-portofolio inicial = [LAKE, DSWL, GIFI, PANL, ALLT]
-
-# Simulação de Monte Carlo
 Ferramenta utilizada: ([Análise de portfólios](https://www.portfoliovisualizer.com/analysis))
 
-Foram considerados três portfólios: O inicial do usuário (citado acima), um após a recomendação do trabalho e outro com recomendações totalmente aleatórias.
+Foram considerados três portfólios: O inicial do usuário, um após a recomendação do trabalho e outro com recomendações totalmente aleatórias.
 
+### Portfólio inicial do usuário (gerado de forma aleatória)
+
+YYYY Inc Class A
+PZZA Papa John's International Inc
+SYNA Synaptics Incorporated
+DVAX Dynavax Technologies Corporation
+WPRT Westport Fuel Systems Inc
+
+### Portfólio aleatório recomendado ( a partir do inicial )
+
+YYYY Inc Class A
+PZZA Papa John's International Inc
+SYNA Synaptics Incorporated
+DVAXD ynavax Technologies Corporation
+WPRT Westport Fuel Systems Inc
+LUMO Lumos Pharma Inc
+CCEC Capital Clean Energy Carriers Corp.
+MKSI MKS Instruments Inc
+JVA Coffee Holding Co Inc
+CORT Corcept Therapeutics Incorporated
+SPSC SPS Commerce Inc
+RRGB Red Robin Gourmet Burgers Inc
+TTEC TTEC Holdings Inc
+
+### Portfólio recomendado com o projeto
+
+YY YY Inc Class A
+PZZA Papa John's International Inc
+SYNA Synaptics Incorporated
+DVAX Dynavax Technologies Corporation
+WPRT Westport Fuel Systems Inc
+AVGO Broadcom Inc
+AMAT Applied Materials Inc
+AMGN Amgen Inc
+BIDU Baidu Inc
+CTSH Cognizant Technology Solutions Corp Class A
+AMZN Amazon.com Inc
+AAPL Apple Inc
+ADBE Adobe Systems Incorporated
+
+([Arquivo completo com os resultados de cada portfólio comparados](https://drive.google.com/file/d/1wSrAJ_I-RL_RNYe26iDv5HhDXJazpo3S/view))
+
+
+O portfólio recomendado se mostrou de fato o melhor entre os três, tendo um crescimento (pág 6 do anexo) acima dos principais índices de mercado, como o S&P 500, entre os anos de 2014 e 2024.
+
+O portfólio aleatório, porém, tem retornos imediatos um pouco acima do portfólio recomendado. Dado que as recomendações não visam ganhos de curto prazo, nem com vendas, nem com dividendos.
+
+O retorno do portfólio recomendado ficou muito acima da inflação anual dos Estados Unidos (pág 10 do anexo).
 
 ## Trabalhos Futuros
 
@@ -118,8 +161,3 @@ Foram considerados três portfólios: O inicial do usuário (citado acima), um a
 * Integrar análises nos testes ( hoje são utilizadas plataformas de terceiros )
 
 * Adicionar a quantidade de ações para cada empresa (Tanto nos portfólios de input como nos recomendados)
-
-
-## Apresentação
-- Slides:
-- Vídeo:

@@ -12,6 +12,7 @@ args = parser.parse_args()
 import sys
 
 sys.path.insert(1, "..")
+
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -162,15 +163,11 @@ class ContentBasedRecommender:
             :number_of_recommendations
         ]
 
+recommender = ContentBasedRecommender()
+recommended_companies = recommender.recommend(
+    target_user_portfolio=args.tickers
+)
 
-# recommender = ContentBasedRecommender()
-# recommended_companies = recommender.recommend(
-#     target_user_portfolio=user_tickers,
-#     companies_to_recommend=companies_to_recommend,
-#     number_of_recommendations=5,
-# )
-#
-# print("AÇÕES RECOMENDADAS")
-# for i, _j in recommended_companies:
-#     print(i)
-#
+print("AÇÕES RECOMENDADAS")
+for i, _j in recommended_companies:
+    print(i)
