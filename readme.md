@@ -103,43 +103,43 @@ Foram considerados três portfólios: O inicial do usuário, um após a recomend
 
 ### Portfólio inicial do usuário (gerado de forma aleatória)
 
-YYYY Inc Class A
-PZZA Papa John's International Inc
-SYNA Synaptics Incorporated
-DVAX Dynavax Technologies Corporation
-WPRT Westport Fuel Systems Inc
+YYYY Inc Class A\
+PZZA Papa John's International Inc\
+SYNA Synaptics Incorporated\
+DVAX Dynavax Technologies Corporation\
+WPRT Westport Fuel Systems Inc\
 
 ### Portfólio aleatório recomendado ( a partir do inicial )
 
-YYYY Inc Class A
-PZZA Papa John's International Inc
-SYNA Synaptics Incorporated
-DVAXD ynavax Technologies Corporation
-WPRT Westport Fuel Systems Inc
-LUMO Lumos Pharma Inc
-CCEC Capital Clean Energy Carriers Corp.
-MKSI MKS Instruments Inc
-JVA Coffee Holding Co Inc
-CORT Corcept Therapeutics Incorporated
-SPSC SPS Commerce Inc
-RRGB Red Robin Gourmet Burgers Inc
-TTEC TTEC Holdings Inc
+YYYY Inc Class A\
+PZZA Papa John's International Inc\
+SYNA Synaptics Incorporated\
+DVAXD ynavax Technologies Corporation\
+WPRT Westport Fuel Systems Inc\
+LUMO Lumos Pharma Inc\
+CCEC Capital Clean Energy Carriers Corp.\
+MKSI MKS Instruments Inc\
+JVA Coffee Holding Co Inc\
+CORT Corcept Therapeutics Incorporated\
+SPSC SPS Commerce Inc\
+RRGB Red Robin Gourmet Burgers Inc\
+TTEC TTEC Holdings Inc\
 
 ### Portfólio recomendado com o projeto
 
-YY YY Inc Class A
-PZZA Papa John's International Inc
-SYNA Synaptics Incorporated
-DVAX Dynavax Technologies Corporation
-WPRT Westport Fuel Systems Inc
-AVGO Broadcom Inc
-AMAT Applied Materials Inc
-AMGN Amgen Inc
-BIDU Baidu Inc
-CTSH Cognizant Technology Solutions Corp Class A
-AMZN Amazon.com Inc
-AAPL Apple Inc
-ADBE Adobe Systems Incorporated
+YY YY Inc Class A\
+PZZA Papa John's International Inc\
+SYNA Synaptics Incorporated\
+DVAX Dynavax Technologies Corporation\
+WPRT Westport Fuel Systems Inc\
+AVGO Broadcom Inc\
+AMAT Applied Materials Inc\
+AMGN Amgen Inc\
+BIDU Baidu Inc\
+CTSH Cognizant Technology Solutions Corp Class A\
+AMZN Amazon.com Inc\
+AAPL Apple Inc\
+ADBE Adobe Systems Incorporated\
 
 ([Arquivo completo com os resultados de cada portfólio comparados](https://drive.google.com/file/d/1wSrAJ_I-RL_RNYe26iDv5HhDXJazpo3S/view))
 
